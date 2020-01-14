@@ -21,6 +21,10 @@ namespace ReactService
 				.ConfigureWebHostDefaults(webBuilder =>
 				{
 					webBuilder.UseStartup<Startup>();
+				})
+				.ConfigureLogging(logging =>
+				{
+					logging.ClearProviders();
 				});
 	}
 }
