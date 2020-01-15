@@ -35,6 +35,7 @@ namespace ReactService.Controllers
 					Id = 3, Title = "Горький", Text = "Жизнь всегда будет достаточно плоха для того, чтоб желание лучшего не угасало в человеке.", Date = new DateTime(2020, 01, 10)
 				},
 			};
+			_logger.LogInformation("Полный вывод статей");
 		}
 
 		[HttpGet]
@@ -47,7 +48,13 @@ namespace ReactService.Controllers
 		{
 			Article article = _articles.FirstOrDefault(x => x.Id == id);
 
-			if (article == null) return NotFound();
+			if (article == null)
+			{
+				_logger.LogError($"Не найдена cтатья по заданному id: {id}");
+				return NotFound();
+			}
+
+			_logger.LogInformation($"Вывод статьи с id: {id}"); ;
 
 			return new ObjectResult(article);
 		}
