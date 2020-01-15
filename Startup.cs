@@ -40,6 +40,8 @@ namespace ReactService
 			}
 			app.UseHttpsRedirection();
 
+			app.UseStatusCodePages("text/plain", "Error. Status code : {0}");
+
 			app.UseCors(builder => builder.AllowAnyOrigin());
 			
 			loggerFactory.AddFile(Path.Combine(Directory.GetCurrentDirectory(), "logger.txt"));
