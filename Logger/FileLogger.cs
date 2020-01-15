@@ -31,7 +31,8 @@ namespace ReactService.Logger
 			{
 				lock(_lock)
 				{
-					File.AppendAllText(_filePath, formatter(state, exception) + Environment.NewLine);
+					File.AppendAllText(_filePath, "(" + TimeZoneInfo.ConvertTime(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("Russian Standard Time")).ToString("dd.MM.yyyy HH:mm:ss") 
+						+ ") " + logLevel.ToString()+ ": " + formatter(state, exception) + Environment.NewLine);
 				}
 			}
 		}
