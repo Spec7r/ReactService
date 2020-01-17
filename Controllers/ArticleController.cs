@@ -35,11 +35,15 @@ namespace ReactService.Controllers
 					Id = 3, Title = "Горький", Text = "Жизнь всегда будет достаточно плоха для того, чтоб желание лучшего не угасало в человеке.", Date = new DateTime(2020, 01, 10)
 				},
 			};
-			_logger.LogInformation("Полный вывод статей");
 		}
 
 		[HttpGet]
-		public ActionResult<IEnumerable<Article>> Get() => new ObjectResult(_articles);
+		public ActionResult<IEnumerable<Article>> Get()
+		{
+			_logger.LogInformation("Полный вывод статей");
+
+			return new ObjectResult(_articles);
+		}
 
 
 		// GET api/article/1
