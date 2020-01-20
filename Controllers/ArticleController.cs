@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using ReactService.Interfaces;
 using ReactService.Models;
 
 namespace ReactService.Controllers
@@ -13,52 +14,58 @@ namespace ReactService.Controllers
     [ApiController]
     public class ArticleController : ControllerBase
     {
-		private IList<Article> _articles;
+		private readonly IRepository _repository;
 
 		private readonly ILogger<ArticleController> _logger;
 
-		public ArticleController(ILogger<ArticleController> logger)
+		public ArticleController(ILogger<ArticleController> logger, IRepository repository)
 		{
 			_logger = logger;
-			_articles = new List<Article>() 
-			{ 
-				new Article() 
-				{ 
-					Id = 1, Title = "Пушкин", Text = "Поэзия, прости господи, должна быть глуповата.", Date = new DateTime(2020, 01, 12) 
-				},
-				new Article()
-				{
-					Id = 2, Title = "Есенин", Text = "Жить нужно легче, жить нужно проще, все принимая, что есть на свете.", Date = new DateTime(2020, 01, 11)
-				},
-				new Article()
-				{
-					Id = 3, Title = "Горький", Text = "Жизнь всегда будет достаточно плоха для того, чтоб желание лучшего не угасало в человеке.", Date = new DateTime(2020, 01, 10)
-				},
-			};
+			_repository = repository;
 		}
 
 		[HttpGet]
 		public ActionResult<IEnumerable<Article>> Get()
 		{
-			_logger.LogInformation("Полный вывод статей");
+			IList<Article> articles = null;
 
-			return new ObjectResult(_articles);
+			try
+			{
+				articles = _repository.GetAll<Article>().Result;
+				_logger.LogInformation($"Полный вывод статей. Количество статей: {articles.Count}");
+			}
+			catch(Exception e)
+			{
+				_logger.LogError($"Ошибка вывода статей:" + Environment.NewLine + e.Message);
+			}
+
+			return new ObjectResult(articles);
 		}
 
 
-		// GET api/article/1
+		// GET api/article/D7D052DC-CC09-443E-844C-1648829BA6A0
 		[HttpGet("{id}")]
-		public ActionResult<Article> Get(int id)
+		public ActionResult<Article> Get(Guid id)
 		{
-			Article article = _articles.FirstOrDefault(x => x.Id == id);
+			Article article = null;
 
-			if (article == null)
+			try
 			{
-				_logger.LogError($"Не найдена cтатья по заданному id: {id}");
-				return NotFound();
-			}
+				article = _repository.Get<Article>(id).Result;
 
-			_logger.LogInformation($"Вывод статьи с id: {id}"); ;
+				if (article == null)
+				{
+					_logger.LogWarning($"Не найдена cтатья по заданному id: {id}");
+				}
+				else
+				{
+					_logger.LogInformation($"Найдена cтатья по заданному id: {id}");
+				}
+			}
+			catch(Exception e)
+			{
+				_logger.LogError($"Ошибка вывода статьи с id: {id}" + Environment.NewLine + e.Message);
+			}
 
 			return new ObjectResult(article);
 		}
