@@ -7,11 +7,15 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using ReactService.Extensions;
+using ReactService.Interfaces;
+using ReactService.Models;
+using ReactService.Repository;
 
 namespace ReactService
 {
@@ -27,8 +31,15 @@ namespace ReactService
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
+			string connection = Configuration.GetConnectionString("DefaultConnection");
+
+			services.AddDbContext<ApplicationContext>(options =>
+				options.UseSqlServer(connection));
+			services.AddScoped<IRepository, EFCoreRepository>();
+
 			services.AddControllers();
 			services.AddCors();
+			
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
