@@ -24,15 +24,16 @@ namespace ReactService.Controllers
 			_repository = repository;
 		}
 
+		// GET api/article
 		[HttpGet]
-		public ActionResult<IEnumerable<Article>> Get()
+		public ActionResult<IEnumerable<Article>> GetAll()
 		{
 			IList<Article> articles = null;
 
 			try
 			{
 				articles = _repository.GetAll<Article>().Result;
-				_logger.LogInformation($"Полный вывод статей. Количество статей: {articles.Count}");
+				_logger.LogInformation($"Полный вывод статей. Количество полученных статей: {articles.Count}");
 			}
 			catch(Exception e)
 			{
@@ -67,7 +68,26 @@ namespace ReactService.Controllers
 				_logger.LogError($"Ошибка вывода статьи с id: {id}" + Environment.NewLine + e.Message);
 			}
 
-			return new ObjectResult(article);
+			return Ok(article);
+		}
+
+		// GET api/article/lastThree
+		[HttpGet("LastThree")]
+		public ActionResult<IEnumerable<Article>> GetLastThree()
+		{
+			List<Article> articles = null;
+
+			try
+			{
+				articles = _repository.GetAll<Article>().Result.OrderByDescending(a => a.Date).Take(3).ToList();
+				_logger.LogInformation($"Получение последних трех статей. Количество полученных статей: {articles.Count}");
+			}
+			catch (Exception e)
+			{
+				_logger.LogError($"Ошибка вывода статей:" + Environment.NewLine + e.Message);
+			}
+
+			return Ok(articles);
 		}
 	}
 }

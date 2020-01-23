@@ -53,8 +53,12 @@ namespace ReactService
 
 			app.UseStatusCodePages("text/plain", "Error. Status code : {0}");
 
-			app.UseCors(builder => builder.AllowAnyOrigin());
-			
+			app.UseCors(x => x
+				.WithOrigins("http://localhost:3000") // путь к нашему SPA клиенту
+				.AllowCredentials()
+		.		AllowAnyMethod()
+				.AllowAnyHeader());
+
 			loggerFactory.AddFile(Path.Combine(Directory.GetCurrentDirectory(), "logger.txt"));
 
 			app.UseRouting();
